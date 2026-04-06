@@ -1,0 +1,27 @@
+# Secrets — NEVER commit these
+.env
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Test files
+test_*.py
+test_connection.py
+
+# Reports generated during testing
+report_*.txt
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml

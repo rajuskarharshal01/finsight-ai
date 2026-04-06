@@ -1,0 +1,71 @@
+services:
+
+  # ── PostgreSQL Database ──────────────────────────────────────
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: finsight_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - finsight_network
+
+  # ── FastAPI Backend ──────────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    container_name: finsight_backend
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - TWELVE_DATA_KEY=${TWELVE_DATA_KEY}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - DATABASE_URL=postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - APP_ENV=production
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - finsight_network
+    restart: unless-stopped
+
+  # ── React Frontend ───────────────────────────────────────────
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    container_name: finsight_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - finsight_network
+    restart: unless-stopped
+
+# ── Shared Network ───────────────────────────────────────────
+# All containers communicate through this internal network
+# "postgres", "backend", "frontend" are hostnames inside network
+networks:
+  finsight_network:
+    driver: bridge
+
+# ── Persistent Volume ────────────────────────────────────────
+volumes:
+  postgres_data:
