@@ -1,0 +1,27 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Test files
+test_*.py
+*.txt.bak
+
+# Environment
+.env
+
+# Git
+.git/
+.gitignore
+
+# Reports generated during testing
+report_*.txt
+
+# Docker
+docker-compose.override.yml
