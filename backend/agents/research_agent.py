@@ -65,8 +65,8 @@ def get_llm():
     but for financial analysis we want factual consistency.
     """
     return ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash-lite",
-        google_api_key=os.getenv("GEMINI_API_KEY"),
+        model="gemini-3.5-flash-lite",
+        google_api_key=os.getenv("GOOGLE_API_KEY"),
         temperature=0
     )
 
